@@ -1,7 +1,8 @@
 # webUploader
-## PHP based web file uploader ##
 
 Enabling quick local file upload, remote file upload (HTTP + cURL), download and file management with minimal permission footprint. The project is designed to be deployed on shared web hosting where quick file sharing is needed.
+
+## Planned Feature List ##
 
 Planned feature list:
   - Local file upload
