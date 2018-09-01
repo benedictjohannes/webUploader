@@ -1,9 +1,12 @@
 <?php 
 require_once ('settings.php');
 
+/* 
+ * stub for session management, still under development 
+ */
 if (isset($_SESSION['discard_after'])) {if (time()>$_SESSION['discard_after']) {
-        // this session has expired; kill it and start a brand new one
-        session_unset(); session_destroy(); session_start();
+	// this session has expired; kill it and start a brand new one
+	session_unset(); session_destroy(); session_start();
 }}
     // either new or old, sessions are kept for $expireTimeout
 $_SESSION['discard_after'] = time() + $expireTimeout;
@@ -20,6 +23,9 @@ session_start;
 <?php
 
 /*
+ * The following commented part is for working commands were working for (only) remote file upload
+ * Recoding to fit better OOP practices and support other feature lists.
+ *
 if (isset($_POST['url'])) {
 function progressCallback($ch , $download_size, $downloaded_size, $upload_size, $uploaded_size ) {
     static $previousProgress = 0;
@@ -128,8 +134,6 @@ class uploadCurl {
         $this->setUrl($getUrlInput);
     }
 }
-
-
 ?>
 
 
