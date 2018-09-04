@@ -118,6 +118,7 @@ class uploadCurl {
         return $progress;
     }
     public function doDownload() {
+			// homework: target file should be set with working folder
         $targetFile = fopen( getname(), 'w' );
         $ch = curl_init( $url );
         curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
@@ -137,6 +138,8 @@ class uploadCurl {
 ?>
 
 
+	// HOMEWORK move to upload form class
+	// HOMEWORK upload form only occurs if upload rights are present in the current folder 
 
 
     <form name='upload' method='post' action="<?php echo $BASE_URL; ?>">
@@ -151,7 +154,6 @@ if (isset($_POST['url'])) {
     $myUploader = new uploadCurl($_POST['url']);
     if (strlen($_POST['filenameUserInput'])>0) {
         $myUploader->setName($_POST['filenameUserInput']);
-        
     } else {
         $myUploader->mkName();
     }

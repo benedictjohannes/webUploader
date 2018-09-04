@@ -4,7 +4,6 @@ Enabling quick local file upload, remote file upload (HTTP + cURL), download and
 
 ## Planned Feature List ##
 
-Planned feature list:
   - Local file upload
   - Remote file upload using cURL
   - Upload progress bar
