@@ -1,6 +1,6 @@
-# webUploader
+# Still Unusable: Under Development
 
-Enabling quick local file upload, remote file upload (HTTP + cURL), download and file management with minimal permission footprint. The project is designed to be deployed on shared web hosting where quick file sharing is needed.
+My purpose is creating a PHP uploader that enables quick local file upload, remote file upload (HTTP + cURL), download and file management with minimal permission footprint. The project is designed to be deployed on shared web hosting where quick file sharing is needed.
 
 ## Planned Feature List ##
 
