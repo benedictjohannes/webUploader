@@ -1,17 +1,19 @@
 <?php 
 require_once ('settings.php');
+require_once ('access.php');
 
 /* 
- * stub for session management, still under development 
+ * session management
  */
+session_start();
+
 if (isset($_SESSION['discard_after'])) {if (time()>$_SESSION['discard_after']) {
 	// this session has expired; kill it and start a brand new one
 	session_unset(); session_destroy(); session_start();
 }}
     // either new or old, sessions are kept for $expireTimeout
-$_SESSION['discard_after'] = time() + $expireTimeout;
-session_start;
-    /* for troubleshooting */ if (isset($_SESSION)) { var_dump($_SESSION); }
+$_SESSION['discard_after'] = time() + $expireTimeout; 
+
 ?>
 
 <!DOCTYPE html>
@@ -49,18 +51,20 @@ function progressCallback($ch , $download_size, $downloaded_size, $upload_size, 
                     file_put_contents( 'progress.txt', '' ); //HOMEWORK!!
     $targetFile = fopen( $name, 'w' );
     $ch = curl_init( $url );
-    curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+    curl_setopt( $ch, CURLOPT_RETURNTRANSFER, true);
     curl_setopt( $ch, CURLOPT_NOPROGRESS, false );
     curl_setopt( $ch, CURLOPT_PROGRESSFUNCTION, 'progressCallback' );
     curl_setopt( $ch, CURLOPT_FILE, $targetFile );
     curl_setopt( $ch, CURLOPT_CONNECTTIMEOUT, 15);
     curl_exec( $ch );
+		echo "I'm here already!"; var_dump($ch);
     if (isset($targetFile)) {
     fclose($targetFile);
     }
 }
-//curl_close($c); //HOMEWORK!!
-*/
+//curl_close($ch); //HOMEWORK!!
+ */
+
 
 class uploadCurl {
     private $url;
@@ -101,7 +105,7 @@ class uploadCurl {
             return NULL;
         }
     }
-    private function progressCallback($ch , $download_size, $downloaded_size, $upload_size, $uploaded_size ) {
+    public function progressCallback($ch , $download_size, $downloaded_size, $upload_size, $uploaded_size ) {
         static $previousProgress = 0;
     
         if ( $download_size == 0 )
@@ -115,18 +119,24 @@ class uploadCurl {
             fputs( $fp, date('ymdHis',time()) . "\t\t$progress\n"  );
             fclose( $fp );
         }
-        return $progress;
+        //return $progress;
     }
     public function doDownload() {
 			// homework: target file should be set with working folder
-        $targetFile = fopen( getname(), 'w' );
-        $ch = curl_init( $url );
+        $targetFile = fopen( $this->getName(), 'w' );
+        $ch = curl_init( $this->url );
         curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
         curl_setopt( $ch, CURLOPT_NOPROGRESS, false );
-        curl_setopt( $ch, CURLOPT_PROGRESSFUNCTION, 'progressCallback' );
+        curl_setopt( $ch, CURLOPT_PROGRESSFUNCTION, 
+				array($this,'progressCallback')
+				/*
+				'progressCallback'  
+				*/
+				);
         curl_setopt( $ch, CURLOPT_FILE, $targetFile );
         curl_setopt( $ch, CURLOPT_CONNECTTIMEOUT, 15);
         curl_exec( $ch );
+			// var_dump($ch);
         if (isset($targetFile)) {
             fclose($targetFile);
         }
@@ -138,8 +148,10 @@ class uploadCurl {
 ?>
 
 
-	// HOMEWORK move to upload form class
-	// HOMEWORK upload form only occurs if upload rights are present in the current folder 
+	<!-- HOMEWORK move to upload form class -->
+	<!--  HOMEWORK upload form only occurs if upload rights are present in the current folder -->
+	
+<?php $BASE_URL = strtok($_SERVER['REQUEST_URI'],'?');?>
 
 
     <form name='upload' method='post' action="<?php echo $BASE_URL; ?>">
@@ -151,17 +163,59 @@ class uploadCurl {
 <?php 
 
 if (isset($_POST['url'])) {
-    $myUploader = new uploadCurl($_POST['url']);
+    $wuUploader = new uploadCurl($_POST['url']);
     if (strlen($_POST['filenameUserInput'])>0) {
-        $myUploader->setName($_POST['filenameUserInput']);
+        $wuUploader->setName($_POST['filenameUserInput']);
     } else {
-        $myUploader->mkName();
+        $wuUploader->mkName();
     }
 }
 if (isset($_POST['execute'])) {
     echo "<br> execute handler / button is clicked";
+	$wuUploader->doDownload(); echo "<br> do download called";
 }
 
+
 ?>
+
+<!-------------------------------------
+below these lines: new document structure
+-------------------------------------->
+
+<?php
+
+
+if ($wuPermissionEnable) {
+	if (!isset($dbconn)) {
+		$dbconn = new mysqli($dbhost, $dbuser, $dbpass, $dbname);
+		if ($dbconn->connect_error) {
+			// homework!! Error handling;
+			echo "<h1> FATAL ERROR: Cannot access database </h1>"; 
+		}
+	}
+	// now that database access is established, we should start:
+		// check session for user login validity
+		// check session for working folder path
+		// get permission for the user
+			// upload permission: check wuTotalSize and user folder size usage
+				// if not over limit, enable upload form
+			// download & manage permission for the folder
+} else {
+	echo "no permissions mode enabled";
+}
+
+// next part: go to document handling
+	// welcoming header for the user
+	// if upload form is enabled, render
+	// if manage permission is enabled, render folder list with rename/delete buttons
+	// if download permission is enabled, render folder list without rename/delete buttons
+	// if user is admin, prepare admin form 
+	// --- (total folder stats only)
+	// --- if clicked admin console, load folder management, user management. 
+
+?>
+
+
+
 </body>
 </html>

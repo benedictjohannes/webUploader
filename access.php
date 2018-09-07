@@ -1,5 +1,6 @@
 <?php 
 
+
 // if no user handling, 
 	// check for file management enabled or not
 	// check for automatic deletion for over quota enabled or not
@@ -18,19 +19,38 @@
 	// working folder checks for rights 
 
 
-class accessControl {
-	
-	function dbconnect() {
-		if (!isset($dbconn)) {
-			$dbconn = new mysqli($dbhost, $dbuser, $dbpass, $dbname;
-			if ($dbconn->connect_error) {
-				// homework!! Error handling;
-				echo "<h1> Fatal error! </h1>";
-			}
-		}
-	}
+/*
+
+DATABASE TABLE STRUCTURES:
+	user		-> id, name, token, login, password, homelimit (negative = no homedir, 0 = nolimit, positive = MB), admin (1=yes)
+	folder 		-> id, name, limit
+	--- single share = 00, MASTER, 0;
+	folderpermit-> folder id, user, permission (0 = no permissions, 1 = read, 2 = read upload, 3 = read manage, 4 = read manage upload)
+	--- single share = applies
+	uploads		-> timestamp, url, size, user id, status (1 = success, 0 = initiate)
+	--- think whether it is necessary: times
 	
 
+*/
+
+
+
+
+
+function random_hex($length)
+{
+	if (version_compare(phpversion(), '7.0.0', '>=')) {
+		$token = bin2hex(random_bytes($length));
+	} elseif (version_compare(phpversion(), '5.3.0', '>=')) {
+		$token = bin2hex(openssl_random_pseudo_bytes($length)); 
+	} else {
+		$pieces = [];
+		for ($i = 0; $i < $length ; ++$i) {
+			$pieces[] = dechex(rand(0,255));
+		}
+		$token = implode('', $pieces);
+	}
+	return $token;
 }
 
 ?>
